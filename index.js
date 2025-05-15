@@ -1,5 +1,12 @@
 require("dotenv").config();
+const express = require("express");
 const { Client, GatewayIntentBits, Partials, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, Events, SlashCommandBuilder, REST, Routes, EmbedBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+
+// Configurar Express para manter o bot ativo no Render
+const app = express();
+const PORT = process.env.PORT || 3000;
+app.get("/", (req, res) => res.send("Bot está rodando!"));
+app.listen(PORT, () => console.log(`🚀 Servidor Express rodando na porta ${PORT}`));
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
@@ -109,59 +116,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       );
 
       await interaction.showModal(modal);
-    }
-  }
-
-  if (interaction.isModalSubmit()) {
-    const button = new ButtonBuilder()
-      .setCustomId("confirmar_pagamento")
-      .setLabel("Confirmar Pagamento")
-      .setStyle(ButtonStyle.Success);
-
-    const row = new ActionRowBuilder().addComponents(button);
-
-    if (interaction.customId === "registrar_plantacao") {
-      const sementes = interaction.fields.getTextInputValue("sementes");
-      const rendimento = interaction.fields.getTextInputValue("rendimento");
-      const tipoSemente = interaction.fields.getTextInputValue("tipo_semente");
-      const obs = interaction.fields.getTextInputValue("obs") || "Nenhuma";
-
-      const embed = new EmbedBuilder()
-        .setTitle("🌱 Nova Plantação Registrada")
-        .addFields(
-          { name: "👤 Usuário:", value: `${interaction.user}`, inline: true },
-          { name: "🌾 Semente:", value: tipoSemente, inline: true },
-          { name: "📦 Quantidade:", value: sementes, inline: true },
-          { name: "📈 Rendimento:", value: rendimento, inline: true },
-          { name: "📝 Observações:", value: obs },
-          { name: "📅 Data:", value: new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }) }
-        )
-        .setColor(0x00FF00)
-        .setFooter({ text: "Fazenda Drake" });
-
-      await interaction.reply({ embeds: [embed], components: [row] });
-    }
-
-    if (interaction.customId === "registrar_animais") {
-      const animal = interaction.fields.getTextInputValue("animal");
-      const quantidade = interaction.fields.getTextInputValue("quantidade");
-      const valor = interaction.fields.getTextInputValue("valor");
-      const observacoes = interaction.fields.getTextInputValue("observacoes") || "Nenhuma";
-
-      const embed = new EmbedBuilder()
-        .setTitle("🐄 Novo Registro do Rancho")
-        .addFields(
-          { name: "👤 Usuário:", value: `${interaction.user}`, inline: true },
-          { name: "🐮 Animal:", value: animal, inline: true },
-          { name: "📦 Quantidade:", value: quantidade, inline: true },
-          { name: "💰 Valor:", value: valor, inline: true },
-          { name: "📝 Observações:", value: observacoes },
-          { name: "📅 Data:", value: new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }) }
-        )
-        .setColor(0xFFA500)
-        .setFooter({ text: "Fazenda Drake" });
-
-      await interaction.reply({ embeds: [embed], components: [row] });
     }
   }
 });
